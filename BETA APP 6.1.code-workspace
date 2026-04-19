@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../BETA APP 6.1"
+		}
+	],
+	"settings": {
+		"liveServer.settings.port": 5501,
+		"liveServer.settings.multiRootWorkspaceName": "APP SET FOTOGRAFICO CLAUDE"
+	}
+}
