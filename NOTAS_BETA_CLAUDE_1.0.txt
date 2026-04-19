@@ -4,8 +4,35 @@ Creada por Hernán Díaz · Dynamic Ideas
 =========================================================
 
 VERSIÓN ACTUAL: APP BETA CLAUDE 1.0 – BUILD 2026-04-19
-APK: SET_FOTOGRAFICO_v4.2_debug.apk
+APK: SET_FOTOGRAFICO_v4.3_debug.apk
 ID App: com.dynamicideas.setfotografico
+
+=========================================================
+SESIÓN CLAUDE – 2026-04-19 (QUINTA ACTUALIZACIÓN)
+=========================================================
+
+MEJORAS IMPLEMENTADAS — APK v4.3:
+
+1. BOTÓN TOMAR FOTOGRAFÍA SEPARADO DE GALERÍA
+   - Antes: un solo botón "📷 TOMAR / GALERÍA" que solo abría la galería
+   - Ahora: dos botones separados, uno bajo el otro, mismo diseño azul:
+     · "📷 TOMAR FOTOGRAFÍA" → abre cámara nativa directamente
+       (usa capture="environment" en el input file)
+     · "🖼️ GALERÍA" → abre la galería del dispositivo (comportamiento anterior)
+   - Las fotos tomadas desde cámara quedan SOLO en la memoria de la app,
+     NO se guardan en la galería del teléfono (decisión deliberada)
+   - Archivos: www/index.html → sección s3 (pantalla de fotografías)
+             www/app.js → previsualizar() acepta inputEl como parámetro
+             www/style.css → clase .btn-galeria agregada
+
+PENDIENTE PARA PRÓXIMA SESIÓN:
+   - Nota de voz por foto: el usuario toma la foto y puede grabar una nota
+     de voz debajo de ella como recordatorio de descripción en terreno
+   - Dos variantes a evaluar:
+     · Solo recordatorio (graba/reproduce, el usuario escribe después)
+     · Transcripción automática con SpeechRecognition API (sin costo,
+       nativa en Android, convierte voz a texto directo en el textarea)
+   - Preferencia del usuario: evaluar mañana
 
 =========================================================
 SESIÓN CLAUDE – 2026-04-19 (CUARTA ACTUALIZACIÓN)

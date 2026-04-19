@@ -135,7 +135,7 @@
     if (!segments || segments.length === 0) return;
 
     if (segments.length === 1) {
-      safeSetFont(doc, null, segments[0].font);
+      safeSetFont(doc, segments[0].forcedFont || null, segments[0].font);
       doc.text(segments[0].text, x, y);
       return;
     }
@@ -143,7 +143,7 @@
     let totalW = 0;
     const widths = [];
     for (const seg of segments) {
-      safeSetFont(doc, null, seg.font);
+      safeSetFont(doc, seg.forcedFont || null, seg.font);
       const w = doc.getTextWidth(seg.text);
       widths.push(w);
       totalW += w;
@@ -153,7 +153,7 @@
     if (totalW >= width || gaps <= 0) {
       let cx = x;
       for (let i = 0; i < segments.length; i++) {
-        safeSetFont(doc, null, segments[i].font);
+        safeSetFont(doc, segments[i].forcedFont || null, segments[i].font);
         doc.text(segments[i].text, cx, y);
         cx += widths[i];
         if (i < segments.length - 1) {
@@ -169,7 +169,7 @@
 
     let cx = x;
     for (let i = 0; i < segments.length; i++) {
-      safeSetFont(doc, null, segments[i].font);
+      safeSetFont(doc, segments[i].forcedFont || null, segments[i].font);
       doc.text(segments[i].text, cx, y);
       cx += widths[i];
       if (i < segments.length - 1) cx += gapSize;
@@ -270,14 +270,14 @@
 
     if (state.y > state.bottomLimit) pageBreakFn();
 
-    const segments = [{ text: label, font: "bold" }, ...firstLineWords.map(w => ({ text: w, font: "normal" }))];
+    const segments = [{ text: label, font: "bold", forcedFont: "helvetica" }, ...firstLineWords.map(w => ({ text: w, font: "normal" }))];
 
     setColor();
     if (restLines.length > 0) {
       drawJustifiedMixedSegments(doc, segments, x, state.y, width);
     } else {
       let cx = x;
-      safeSetFont(doc, null, "bold"); doc.text(label, cx, state.y); cx += doc.getTextWidth(label);
+      safeSetFont(doc, "helvetica", "bold"); doc.text(label, cx, state.y); cx += doc.getTextWidth(label);
       safeSetFont(doc, null, "normal"); doc.text(" " + firstLineWords.join(" "), cx, state.y);
     }
 
@@ -467,14 +467,13 @@
 
     if (membrete) {
       drawMembrete();
-      state.y = Math.max(state.y, membreteY + membreteSize + 6 + (3.1 * 3));
+      state.y = 30;
     }
 
     // TITULO
     printTitleUnderlinedSafe(doc, ctx.titleUpper, pW, usefulW, state, pageBreakFn);
 
-    // FOTOS (ancho fijo 100mm = 10 cm, alto proporcional)
-    const FIXED_IMG_W = 100;
+    // FOTOS: horizontal=100mm(10cm), cuadrada=100x100mm(10x10cm), vertical=80mm(8cm). Alto siempre proporcional.
     doc.setFontSize(12);
 
     for (let i = 0; i < ctx.photos.length; i++) {
@@ -485,6 +484,7 @@
       // ✅ PARCHE 2: pasar id para usar cache base64 y evitar reconversion
       const dataUrl = await ctx.blobToDataURL(blob, p.id);
 
+      const FIXED_IMG_W = p.hRatio > 1 ? 80 : 100;
       let finalW = Math.min(FIXED_IMG_W, usefulW);
       let finalH = finalW * p.hRatio;
 

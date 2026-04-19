@@ -358,9 +358,9 @@ body.app-ready .card{
   z-index:10;
   box-shadow: 0 4px 18px rgba(30,58,138,0.35);
 }
-.brand{display:flex;align-items:center;justify-content:center;gap:10px;}
-.brand img{width:30px;height:30px;border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.25);}
-.brand-text{display:flex;flex-direction:column;align-items:flex-start;}
+.brand{display:flex;align-items:center;justify-content:center;position:relative;width:100%;}
+.brand img{width:30px;height:30px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.25);position:absolute;left:0;}
+.brand-text{display:flex;flex-direction:column;align-items:center;text-align:center;}
 .brand .brand-title{
   font-size:1.2rem;margin:0;
   color:#ffffff;font-weight:900;
@@ -511,6 +511,7 @@ button:disabled{
 
 input[type="file"]{display:none;}
 .btn-camara{background:var(--btn-main);display:flex;align-items:center;justify-content:center;gap:10px;}
+.btn-galeria{background:var(--btn-ok);display:flex;align-items:center;justify-content:center;gap:10px;}
 
 .item-foto{
   border:1px solid var(--border);

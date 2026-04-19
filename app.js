@@ -1767,8 +1767,8 @@ async function borrarTodo(){
 /***********************
  * PHOTO FLOW
  ***********************/
-async function previsualizar(){
-  const input = document.getElementById('f_input');
+async function previsualizar(inputEl){
+  const input = inputEl || document.getElementById('f_input');
   if (!(input.files && input.files[0])) {
     document.getElementById('status').innerText = "";
     clearPreview();
