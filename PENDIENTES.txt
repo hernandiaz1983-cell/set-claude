@@ -1,0 +1,4 @@
+PENDIENTES
+
+- Agregar soporte para imagenes HEIC/HEIF (conversion a JPG con libreria externa).
+- Completar telefonos y direcciones de utilidad (todas las instituciones restantes).

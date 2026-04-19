@@ -1,0 +1,207 @@
+=========================================================
+NOTAS BETA CLAUDE 1.0 – SET FOTOGRÁFICO
+Creada por Hernán Díaz · Dynamic Ideas
+=========================================================
+
+VERSIÓN ACTUAL: APP BETA CLAUDE 1.0 – BUILD 2026-04-18
+APK: SET_FOTOGRAFICO_v3.9_debug.apk
+ID App: com.dynamicideas.setfotografico
+
+=========================================================
+SESIÓN CLAUDE – 2026-04-18 (TERCERA ACTUALIZACIÓN)
+=========================================================
+
+CORRECCIONES Y MEJORAS IMPLEMENTADAS:
+
+1. CORRECCIÓN ERROR PDF (CUOTA LOCALSTORAGE)
+   - Error: "Failed to execute 'setItem' on 'Storage':
+     setting the value of 'set_pdf_library_v1' exceeded the quota"
+   - Causa: el PDF completo (dataUrl base64) se guardaba en
+     localStorage que tiene límite de ~5-10MB
+   - Solución: savePdfLibrary() ahora captura el error de cuota y
+     reintenta progresivamente:
+     · Primero: guarda solo el PDF más nuevo completo, resto sin dataUrl
+     · Segundo: guarda solo el más nuevo sin dataUrl
+     · Último: omite silenciosamente sin interrumpir la generación
+   - La generación del PDF ya NO falla por este error
+
+2. FECHA EN PDF – FORMATO "OSORNO + FECHA" A LA DERECHA
+   - Antes: "FECHA: 18 de abril de 2026" centrado en la página
+   - Ahora: "OSORNO 18 de Abril del 2026"
+   - Posición: alineada a la derecha (desde el margen derecho)
+   - Mes siempre con mayúscula inicial, "del" antes del año
+
+3. TEMA OSCURO MOVIDO AL MENÚ DE OPCIONES
+   - Eliminado el interruptor (switch) de la pantalla principal
+   - Ahora aparece dentro de "MENÚ DE OPCIONES" como botón estilo
+     "TEMA OSCURO: OFF / TEMA OSCURO: ON"
+   - Mismo diseño que los otros submenús (PLANTILLAS, BORRADORES,
+     VER PDF RECIENTES)
+
+4. "PRODUCTIVIDAD" REDUCIDA EN SEGUNDA PANTALLA
+   - La palabra PRODUCTIVIDAD era demasiado larga para el recuadro
+   - CSS ajustado: font-size reducido a 1.1rem (antes 1.6rem)
+   - En dispositivos pequeños (<520px): 0.95rem
+
+5. FUENTE DE PLANTILLA EN "PLANTILLAS GUARDADAS" (NUEVO SET)
+   - Al acceder a Nuevo Set > Plantillas Guardadas, el nombre de
+     cada plantilla ahora se muestra con la fuente seleccionada
+     en esa plantilla (Calibri/Arial → Segoe UI, Times → serif,
+     Courier → monospace, etc.)
+
+6. PANTALLA MEMBRETE SIMPLIFICADA
+   - Eliminada la opción "IMAGEN" (botón imagen removido)
+   - Eliminado el botón "TEXTO" (la pantalla siempre muestra texto)
+   - El encabezado "LÍNEAS DE TEXTO (3)" aparece centrado arriba
+   - Los 3 campos de texto son inmediatamente visibles sin submenús
+
+7. BOTÓN "VOLVER ATRÁS" EN TODAS LAS PANTALLAS DESDE NUEVO SET
+   - Reemplazado "Volver al Menú" por "VOLVER ATRÁS" en: Nuevo Set
+     (s9), Título (s2), Fotografías (s3), Datos de Cierre (s4),
+     Membrete (s8), Configuración Plantilla (s7)
+   - Implementado sistema de historial de navegación (stepHistory)
+   - Cada "VOLVER ATRÁS" regresa a la pantalla anterior real
+   - Al volver al menú principal (s1) el historial se limpia
+
+8. APK GENERADA
+   - Archivo: SET_FOTOGRAFICO_v3.9_debug.apk
+   - Reemplaza: SET_FOTOGRAFICO_v3.8_debug.apk
+   - Build: 2026-04-18 · Gradle assembleDebug exitoso
+
+=========================================================
+SESIÓN CLAUDE – 2026-04-18 (SEGUNDA ACTUALIZACIÓN)
+=========================================================
+
+CAMBIOS REALIZADOS:
+
+1. VERSIÓN Y FOOTER
+   - Actualizado VERSION_LABEL a "APP BETA CLAUDE 1.0"
+   - Build date: 2026-04-17
+   - Footer: "CREADA POR HERNAN DIAZ APP BETA CLAUDE 1.0 BUILD 2026-04-17"
+
+2. BOTÓN BORRAR RENOMBRADO
+   - Cambio de "Borrar e Iniciar de Nuevo" a "BORRAR E IR A INICIO"
+
+3. COLOR DE NOTA EN ESPAÑOL
+   - El selector de color de la nota final ahora muestra en español:
+     NEGRO / ROJO / AZUL / AMARILLO (antes mostraba BLACK/RED/BLUE/YELLOW)
+   - El textarea de la nota final cambia de color dinámicamente al seleccionar
+     (rojo se ve en rojo, azul en azul, etc.)
+
+4. SEGUNDA PANTALLA – IMÁGENES CUADRADAS Y PROPORCIONALES
+   - Corregido el problema de la segunda fotografía que se agrandaba y perdía proporción
+   - Todas las tarjetas de ilustración tienen ahora ancho fijo (min(88vw, 280px))
+   - Las imágenes usan un wrapper de altura fija (90px) con object-fit:cover
+   - Las tres ilustraciones lucen uniformes y proporcionales
+
+5. BOTÓN SKIP EN SEGUNDA PANTALLA
+   - Agregado botón "SALTAR ›" que aparece de inmediato en la segunda pantalla
+   - Posicionado en esquina inferior derecha, sobre el contenido
+   - Lleva al menú principal al instante sin esperar la animación completa
+   - Estilo translúcido sobre el fondo navy
+
+6. CORRECTOR ORTOGRÁFICO
+   - Habilitado spellcheck="true" + lang="es" en los textareas de texto libre:
+     · Título del informe (ti_in)
+     · Título en revisión (ti_in_review)
+     · Descripción de foto (f_txt)
+     · Nota final (final_conclusion)
+   - El teclado Android y el navegador subrayarán en rojo palabras incorrectas
+
+7. PANELES ACORDEÓN (PRIVACIDAD Y CLIMA)
+   - En el menú inicial, los paneles "Privacidad" y "Clima" ahora son acordeones
+   - Solo muestran el título con flecha ▼ al inicio
+   - Se expanden/colapsan al presionar el panel
+   - El clima sigue cargando en background aunque el panel esté colapsado
+
+=========================================================
+SESIÓN CLAUDE – 2026-04-17 (PRIMERA ACTUALIZACIÓN)
+=========================================================
+
+MEJORAS IMPLEMENTADAS:
+
+1. FIRMA DIGITAL
+   - Opción para subir fotografía de firma en "Datos de Cierre" (s4)
+   - Opción para subir fotografía de firma en "Nueva Plantilla" (s7)
+   - Máximo 5 cm de ancho en el PDF, altura siempre proporcional
+   - Si se sube firma digital, reemplaza el pie de firma de texto (nombre + cargo)
+   - La firma de la plantilla se guarda y restaura al editar
+
+2. EDITAR PLANTILLA
+   - El botón EDITAR ya estaba implementado; se verificó y mejoró la restauración
+   - Al editar una plantilla, ahora también restaura la imagen de firma digital
+
+3. NUMERACIÓN CORRELATIVA DE INFORMES
+   - Los PDFs se guardan con nombre: DDMMYYYY-NN.pdf (ej: 17042026-01.pdf)
+   - El contador es correlativo por día (reinicia cada día)
+   - Si se generan 3 PDFs en el mismo día: 17042026-01, -02, -03
+
+4. COMPARTIR PDF
+   - En "VER PDF RECIENTES" cada PDF tiene botón "📤 COMPARTIR"
+   - Usa Capacitor Share para enviar por WhatsApp, email, etc.
+   - En Android, escribe el PDF a carpeta CACHE y abre el diálogo de compartir
+   - Fallback: abre en nueva pestaña si Share no está disponible
+
+5. ANCHO DE FOTOS EN PDF: 10 CM
+   - Cambiado de 12 cm a 10 cm de ancho fijo
+   - La altura siempre es proporcional al aspecto real de la imagen
+   - No se deforma en ningún caso
+
+6. DISEÑO PREMIUM NAVY/GOLD
+   - Paleta principal: Navy profundo (#1e3a8a) + Oro premium (#c2870d)
+   - Header con gradiente navy y sombra
+   - Botones con gradientes refinados y sombras por tipo:
+     · Principal (azul navy), Acción (oro/ámbar), Secundario (slate),
+       Peligro (rojo), Editar (púrpura)
+   - Paneles con glassmorphism y sombra sutil
+   - Template-items en columna vertical con bordes redondeados
+   - h2 con subrayado dorado en lugar de azul
+
+7. ÍCONO PROFESIONAL
+   - SVG rediseñado: cámara con lente dorada sobre fondo navy
+   - Anillos concéntricos gold/navy para el lente
+   - Flash cuadrado dorado, visor pentaprisma
+   - Generado en todos los tamaños Android:
+     ldpi(36), mdpi(48), hdpi(72), xhdpi(96), xxhdpi(144), xxxhdpi(192)
+   - Iconos round e ic_launcher actualizados
+
+=========================================================
+HISTORIAL PREVIO (antes de sesiones Claude)
+=========================================================
+
+VERSIÓN 3.8 – Estado FREE lista
+   - Estado FREE por defecto con enforcement duro y fuente premium validada
+   - UI FREE visible (badges en menu/revision) y modal de upsell
+   - Límite FREE 6 fotos con bloqueo real
+   - Ads solo FREE: banner + 2 videos antes de PDF con aviso previo
+   - PDF FREE con watermark más visible y compresión extra
+   - Menú Premium con submenú de Plantillas y biblioteca (máx 5)
+
+VERSIÓN 3.0 – Publicidad instalada
+   - Capacitor v6 inicializado (appId com.dynamicideas.setfotografico)
+   - Plataforma Android creada, web assets movidos a www/
+   - AdMob plugin @capacitor-community/admob@6.2.0 instalado
+   - AndroidManifest con APPLICATION_ID de AdMob
+   - Ads en app: initAds + banner inferior (FREE) + 2 rewarded antes de PDF
+   - FREE/PREMIUM: límite 6 fotos, contador en revisión, bloqueo y marca de agua
+   - Pantalla Premium, botón premium y slot de publicidad en menú
+   - Watermark tipo sello en PDF para versión gratuita
+
+=========================================================
+PENDIENTES / IDEAS FUTURAS
+=========================================================
+
+- [ ] Firma dibujada con el dedo (canvas táctil)
+- [ ] Grid de fotos en PDF (2 fotos por fila)
+- [ ] Recorte de fotos (crop)
+- [ ] Múltiples notas finales con secciones
+- [ ] Exportar/importar datos (backup JSON)
+- [ ] Vista previa del PDF dentro de la app
+- [ ] Drag & drop para reordenar fotos
+- [ ] Barra de progreso del informe (1/5, 2/5...)
+- [ ] Soporte HEIC (conversión automática desde iPhone)
+- [ ] Verificar funcionamiento del corrector ortográfico en dispositivos Android
+
+=========================================================
+FIN DE NOTAS
+=========================================================

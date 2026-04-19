@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#0f172a"/>
+  <rect x="96" y="190" width="320" height="190" rx="30" fill="#1e293b"/>
+  <rect x="150" y="150" width="90" height="50" rx="12" fill="#334155"/>
+  <rect x="250" y="150" width="70" height="40" rx="10" fill="#475569"/>
+  <circle cx="256" cy="285" r="90" fill="#0b1220"/>
+  <circle cx="256" cy="285" r="70" fill="#111827"/>
+  <circle cx="256" cy="285" r="52" fill="#1f2937"/>
+  <circle cx="256" cy="285" r="42" fill="#0f172a"/>
+  <text x="256" y="302" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#e2e8f0">SF</text>
+  <circle cx="176" cy="228" r="10" fill="#22c55e"/>
+</svg>
