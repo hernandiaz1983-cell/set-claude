@@ -511,7 +511,7 @@ button:disabled{
 
 input[type="file"]{display:none;}
 .btn-camara{background:var(--btn-main);display:flex;align-items:center;justify-content:center;gap:10px;}
-.btn-galeria{background:var(--btn-sec);display:flex;align-items:center;justify-content:center;gap:10px;}
+.btn-galeria{background:var(--btn-main);display:flex;align-items:center;justify-content:center;gap:10px;}
 
 .item-foto{
   border:1px solid var(--border);
