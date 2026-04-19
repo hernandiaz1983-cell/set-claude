@@ -7,6 +7,20 @@
  ***********************/
 const VERSION_LABEL = "APP BETA CLAUDE 1.0";
 const BUILD_DATE = "2026-04-17";
+const EXPIRY_DATE = new Date(2026, 4, 20, 0, 0, 0); // 20 Mayo 2026 00:00 hora local
+
+function checkExpiry() {
+  if (new Date() >= EXPIRY_DATE) {
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0c1526;color:#f59e0b;font-family:'Segoe UI',sans-serif;text-align:center;padding:2rem;">
+        <img src="imagenes/icon-sf.svg" style="width:80px;margin-bottom:2rem;opacity:0.8;">
+        <h2 style="font-size:1.4rem;margin-bottom:1rem;color:#f59e0b;letter-spacing:1px;">SU VERSIÓN DE PRUEBA HA TERMINADO</h2>
+        <p style="color:#94a3b8;font-size:0.9rem;">Contacte al administrador para renovar su acceso.</p>
+      </div>`;
+    return true;
+  }
+  return false;
+}
 
 const TEMPLATE_LIBRARY_KEY = "set_template_library_v1";
 const TEMPLATE_LIBRARY_MAX = 5;
@@ -1213,9 +1227,23 @@ function togglePanel(contentId, arrowId){
 function uuid(){ return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9); }
 function revokeAllUrls(){ photos.forEach(p => { if (p.url) URL.revokeObjectURL(p.url); }); }
 
+function initModoEscritorio(){
+  const isNative = window.Capacitor?.isNativePlatform?.() === true;
+  if (!isNative) {
+    const btn = document.getElementById('btnModoEscritorio');
+    if (btn) btn.style.display = 'block';
+  }
+}
+
+function toggleModoEscritorio(){
+  const isDesktop = document.body.classList.toggle('modo-escritorio');
+  const btn = document.getElementById('btnModoEscritorio');
+  if (btn) btn.textContent = isDesktop ? '📱 CAMBIAR A VERSIÓN MÓVIL' : '🖥️ CAMBIAR A VERSIÓN WEB';
+}
+
 function setFooter(){
-  document.getElementById("footerText").textContent =
-    `CREADA POR HERNAN DIAZ ${VERSION_LABEL} BUILD ${BUILD_DATE}`;
+  document.getElementById("footerText").innerHTML =
+    `CREADA POR HERNAN DIAZ DINAMARCA<br>${VERSION_LABEL} BUILD ${BUILD_DATE}<br>FUNCIONANDO HASTA EL 20.05.2026`;
 }
 
 /***********************
@@ -1408,7 +1436,7 @@ async function optimizeImageFileToBlob(file){
   let useResizedBitmap = false;
   try {
     // Intentar decodificar ya redimensionado para ahorrar memoria (si el navegador soporta).
-    bmp = await createImageBitmap(file, { resizeWidth: maxSide, resizeQuality: "high" });
+    bmp = await createImageBitmap(file, { resizeWidth: maxSide, resizeQuality: "medium" });
     useResizedBitmap = true;
   } catch (e) {
     try {
@@ -1453,6 +1481,7 @@ async function optimizeImageFileToBlob(file){
 window.onload = () => {
   setFooter();
   initTheme();
+  initModoEscritorio();
 
   const splash = document.getElementById('splash');         // Skin 1
   const splashWords = document.getElementById('splash-words'); // Skin 2
@@ -1476,13 +1505,15 @@ window.onload = () => {
   setTimeout(() => {
     if (splash) splash.classList.add('hidden');
 
+    if (checkExpiry()) return;
+
     if (!skipSkin2) {
       // Mostrar Skin 2 solo en primer arranque de la sesión
       if (splashWords) splashWords.classList.remove('hidden');
 
       setTimeout(() => {
         if (splashWords) splashWords.classList.add('hidden');
-        document.body.classList.add('app-ready');
+        if (!checkExpiry()) document.body.classList.add('app-ready');
       }, splashWordsDuration);
     } else {
       // Saltar Skin 2
@@ -1509,7 +1540,7 @@ async function arrancarSeguridadYMenu(){
     await idbClearAll();
 
     document.getElementById('ti_in').value = "";
-    document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('f_date').value = (() => { const _n = new Date(); return `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`; })();
     document.getElementById('f_nom').value = "";
     document.getElementById('f_rank').value = "";
     document.getElementById('final_conclusion').value = "";
@@ -1591,7 +1622,7 @@ async function nuevoInforme(){
     clearPreview();
 
     document.getElementById('ti_in').value = "";
-    document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('f_date').value = (() => { const _n = new Date(); return `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`; })();
     document.getElementById('f_nom').value = "";
     document.getElementById('f_rank').value = "";
     document.getElementById('final_conclusion').value = "";
@@ -1698,7 +1729,7 @@ async function loadLocal(){
   if (saved) {
     const data = JSON.parse(saved);
     document.getElementById('ti_in').value = data.title || "";
-    document.getElementById('f_date').value = data.date || new Date().toISOString().split('T')[0];
+    document.getElementById('f_date').value = data.date || (() => { const _n = new Date(); return `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`; })();
     document.getElementById('f_nom').value = data.name || "";
     document.getElementById('f_rank').value = data.rank || "";
     document.getElementById('final_conclusion').value = data.conclusion || "";
@@ -1712,7 +1743,7 @@ async function loadLocal(){
       }
     }
   } else {
-    document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('f_date').value = (() => { const _n = new Date(); return `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`; })();
   }
   updatePdfButtonState();
 }
@@ -1745,12 +1776,20 @@ async function previsualizar(){
   }
 
   const file = input.files[0];
-  document.getElementById('status').innerText = "Imagen seleccionada: " + file.name;
+  document.getElementById('status').innerText = "Procesando imagen...";
+
+  // Mostrar foto cruda inmediatamente mientras se comprime en background
+  const rawUrl = URL.createObjectURL(file);
+  const imgEl = document.getElementById('previewImg');
+  if (imgEl) { imgEl.src = rawUrl; imgEl.style.display = 'block'; }
 
   try {
     const outBlob = await optimizeImageFileToBlob(file);
+    URL.revokeObjectURL(rawUrl);
     showPreviewFromBlob(outBlob);
+    document.getElementById('status').innerText = "Imagen seleccionada: " + file.name;
   } catch (e) {
+    URL.revokeObjectURL(rawUrl);
     console.error(e);
     const msg = (e && e.message) ? e.message : "Error al preparar la imagen. Intente con otra foto o una captura de pantalla.";
     alert(msg);
@@ -1850,18 +1889,29 @@ async function procesarFoto(){
   }
 }
 
-async function eliminarFoto(index){
-  if (confirm("¿Eliminar esta foto?")) {
-    const p = photos[index];
-    if (p?.id) photoDataUrlCache.delete(p.id);
-    if (p?.url) URL.revokeObjectURL(p.url);
+let _pendingDeleteIndex = null;
 
-    photos.splice(index, 1);
-    saveLocal();
-    dibujarRevision();
+function eliminarFoto(index){
+  _pendingDeleteIndex = index;
+  document.getElementById('deletePhotoModal').style.display = 'flex';
+}
 
-    if (p?.id) { try { await idbDeletePhoto(p.id); } catch(_) {} }
-  }
+function cerrarModalEliminar(){
+  _pendingDeleteIndex = null;
+  document.getElementById('deletePhotoModal').style.display = 'none';
+}
+
+async function confirmarEliminarFoto(){
+  cerrarModalEliminar();
+  const index = _pendingDeleteIndex;
+  if (index === null) return;
+  const p = photos[index];
+  if (p?.id) photoDataUrlCache.delete(p.id);
+  if (p?.url) URL.revokeObjectURL(p.url);
+  photos.splice(index, 1);
+  saveLocal();
+  dibujarRevision();
+  if (p?.id) { try { await idbDeletePhoto(p.id); } catch(_) {} }
 }
 
 function actualizarDesc(index, val){

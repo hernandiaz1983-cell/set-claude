@@ -3,9 +3,85 @@ NOTAS BETA CLAUDE 1.0 – SET FOTOGRÁFICO
 Creada por Hernán Díaz · Dynamic Ideas
 =========================================================
 
-VERSIÓN ACTUAL: APP BETA CLAUDE 1.0 – BUILD 2026-04-18
-APK: SET_FOTOGRAFICO_v3.9_debug.apk
+VERSIÓN ACTUAL: APP BETA CLAUDE 1.0 – BUILD 2026-04-19
+APK: SET_FOTOGRAFICO_v4.2_debug.apk
 ID App: com.dynamicideas.setfotografico
+
+=========================================================
+SESIÓN CLAUDE – 2026-04-19 (CUARTA ACTUALIZACIÓN)
+=========================================================
+
+MEJORAS IMPLEMENTADAS (8 EN TOTAL) — APK v4.2:
+
+1. VELOCIDAD DE CARGA DE FOTOS (MEJORA #1)
+   - Antes: la miniatura aparecía recién DESPUÉS de comprimir (3-4 seg de espera)
+   - Ahora: la foto se muestra al instante con URL.createObjectURL() mientras
+     la compresión corre en segundo plano y reemplaza silenciosamente la imagen
+   - Además: resizeQuality cambiado de "high" a "medium" para acelerar compresión
+   - Archivos: www/app.js → función previsualizar()
+
+2. FECHA PREDETERMINADA CON TIMEZONE CHILE (MEJORA #2)
+   - Antes: new Date().toISOString().split('T')[0] usaba UTC → después de las
+     21:00/20:00 chilenas mostraba el día siguiente como fecha por defecto
+   - Ahora: fecha calculada con getFullYear/getMonth/getDate (hora local del
+     dispositivo), sin conversión UTC
+   - Archivos: www/app.js → líneas donde se inicializa la fecha (2 ocurrencias)
+
+3. TÍTULO DEL SET MÁS SEPARADO DEL MEMBRETE EN PDF (MEJORA #3)
+   - Antes: 6mm de separación fija entre membrete y título del set
+   - Ahora: 6mm + 3 líneas extra (~9.3mm adicionales) de separación visual
+   - Archivos: www/pdf-logic.js → cálculo de posición del título
+
+4. TERCERA LÍNEA EN EL FOOTER DE LA APP (MEJORA #4)
+   - Antes: footer con 2 líneas ("CREADA POR HERNAN DIAZ DINAMARCA" + versión)
+   - Ahora: 3 líneas, la tercera dice "FUNCIONANDO HASTA EL 20.05.2026"
+   - Archivos: www/app.js → función setFooter() (textContent → innerHTML)
+
+5. FECHA DE VENCIMIENTO DE LA APK AL 20/05/2026 (MEJORA #5)
+   - La app verifica al iniciar si la fecha local supera el 20/05/2026 00:00
+   - Si venció: oculta toda la app y muestra pantalla con logo y mensaje
+     "SU VERSIÓN DE PRUEBA HA TERMINADO / Contacte al administrador"
+   - Usa fecha LOCAL del dispositivo (no UTC), consistente con Mejora #2
+   - Verificación ocurre después del splash y antes de cargar la UI principal
+   - Archivos: www/app.js → constante EXPIRY_DATE + función checkExpiry()
+
+6. BOTÓN "VOLVER ATRÁS" EN PANTALLA DE REVISIÓN FINAL (MEJORA #6)
+   - Agregado botón "← Volver atrás" entre "+ Agregar más fotos" y
+     "🗑️ BORRAR E IR A INICIO" en la pantalla de revisión (paso 5)
+   - Permite retroceder al paso 4 sin perder los datos del set
+   - Archivos: www/index.html → sección paso 5
+
+7. MODAL DE CONFIRMACIÓN AL ELIMINAR FOTO (MEJORA #7)
+   - Antes: confirm() nativo del sistema (pequeño, fácil de aceptar por error)
+   - Ahora: modal personalizado a pantalla completa con:
+     · Botón "ELIMINAR" (rojo, requiere tap deliberado)
+     · Botón "CANCELAR" (prominente, seguro)
+   - Archivos: www/index.html → modal #deletePhotoModal
+             www/app.js → funciones eliminarFoto(), cerrarModalEliminar(),
+                          confirmarEliminarFoto(), variable _pendingDeleteIndex
+
+8. BOTÓN "VERSIÓN WEB" CON DISEÑO APPLE SOLO EN NAVEGADOR (MEJORA #8)
+   - Solo visible cuando la app corre en navegador (no en APK Android)
+   - Detectado con window.Capacitor?.isNativePlatform?.()
+   - Al presionar activa clase CSS "modo-escritorio" en el body
+   - Diseño tipo Apple activado: fondo #f5f5f7, tipografía SF Pro,
+     max-width 820px centrado, bordes redondeados, sombras suaves,
+     fotos más grandes, transiciones suaves
+   - Botón alterna entre "🖥️ CAMBIAR A VERSIÓN WEB" y "📱 CAMBIAR A VERSIÓN MÓVIL"
+   - Archivos: www/app.js → funciones initModoEscritorio(), toggleModoEscritorio()
+             www/index.html → botón #btnModoEscritorio antes del footer
+             www/style.css → reglas body.modo-escritorio
+
+CORRECCIÓN ADICIONAL — DEFORMACIÓN DE FOTOS:
+   - Bug: createImageBitmap con resizeWidth Y resizeHeight forzaba imagen cuadrada
+   - Solución: eliminado resizeHeight, escala recalculada siempre proporcionalmente
+   - Las fotos ahora mantienen su relación de aspecto original (ej: 15x10 → 10x6.66)
+   - Archivos: www/app.js → función optimizeImageFileToBlob()
+
+APK GENERADA:
+   - Archivo: SET_FOTOGRAFICO_v4.2_debug.apk
+   - Reemplaza: SET_FOTOGRAFICO_v3.9_debug.apk
+   - Build: 2026-04-19 · Gradle assembleDebug exitoso
 
 =========================================================
 SESIÓN CLAUDE – 2026-04-18 (TERCERA ACTUALIZACIÓN)

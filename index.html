@@ -268,6 +268,7 @@
         <button class="btn-sec" onclick="guardarBorrador()">GUARDAR BORRADOR</button>
 
         <button class="btn-sec" onclick="cambiarPaso(3)">+ Agregar más fotos</button>
+        <button class="btn-sec" onclick="cambiarPaso(4)">← Volver atrás</button>
         <button class="btn-danger" onclick="borrarTodo()">🗑️ BORRAR E IR A INICIO</button>
       </div>
 
@@ -426,6 +427,17 @@
       </div>
     </div>
 
+    <div id="deletePhotoModal" class="modal-backdrop" style="display:none;">
+      <div class="modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+        <h3>Eliminar foto</h3>
+        <p>¿Estás seguro que querés eliminar esta foto? No se puede recuperar.</p>
+        <div class="modal-actions">
+          <button class="btn-danger" onclick="confirmarEliminarFoto()">ELIMINAR</button>
+          <button class="btn-sec" onclick="cerrarModalEliminar()">CANCELAR</button>
+        </div>
+      </div>
+    </div>
+
     <div id="pdfModal" class="modal-backdrop" onclick="window.SETPDF && window.SETPDF.closePdfModal()">
       <div class="modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
         <h3>PDF generado</h3>
@@ -437,6 +449,7 @@
       </div>
     </div>
 
+    <button id="btnModoEscritorio" style="display:none;margin:0 auto 8px;padding:8px 20px;background:none;border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:0.75rem;cursor:pointer;letter-spacing:0.5px;" onclick="toggleModoEscritorio()">🖥️ CAMBIAR A VERSIÓN WEB</button>
     <footer class="app-footer" id="footerText"></footer>
   </div>
 

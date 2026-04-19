@@ -467,7 +467,7 @@
 
     if (membrete) {
       drawMembrete();
-      state.y = Math.max(state.y, membreteY + membreteSize + 6);
+      state.y = Math.max(state.y, membreteY + membreteSize + 6 + (3.1 * 3));
     }
 
     // TITULO
