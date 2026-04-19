@@ -1408,7 +1408,7 @@ async function optimizeImageFileToBlob(file){
   let useResizedBitmap = false;
   try {
     // Intentar decodificar ya redimensionado para ahorrar memoria (si el navegador soporta).
-    bmp = await createImageBitmap(file, { resizeWidth: maxSide, resizeHeight: maxSide, resizeQuality: "high" });
+    bmp = await createImageBitmap(file, { resizeWidth: maxSide, resizeQuality: "high" });
     useResizedBitmap = true;
   } catch (e) {
     try {
@@ -1420,7 +1420,7 @@ async function optimizeImageFileToBlob(file){
 
   const w0 = bmp.width, h0 = bmp.height;
   const maxDim = Math.max(w0, h0);
-  const scale = (useResizedBitmap ? 1 : (maxDim > maxSide ? (maxSide / maxDim) : 1));
+  const scale = maxDim > maxSide ? (maxSide / maxDim) : 1;
   const w = Math.max(1, Math.round(w0 * scale));
   const h = Math.max(1, Math.round(h0 * scale));
 

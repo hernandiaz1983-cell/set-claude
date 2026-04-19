@@ -10,7 +10,9 @@
       "Bash(git push *)",
       "Bash(gh auth *)",
       "Bash(git config *)",
-      "Bash(ssh -T git@github.com)"
+      "Bash(ssh -T git@github.com)",
+      "Bash(npx cap *)",
+      "Bash(./gradlew assembleDebug)"
     ]
   }
 }
