@@ -477,8 +477,23 @@ async function savePdfOnAndroid(res){
 function openPdfFromLibrary(id){
   const list = loadPdfLibrary();
   const item = list.find((p) => p.id === id);
-  if (!item || !item.dataUrl) return;
-  window.open(item.dataUrl, "_blank");
+  if (!item || !item.dataUrl){ alert("No se encontró el PDF."); return; }
+  try {
+    const b64 = item.dataUrl.includes(",") ? item.dataUrl.split(",")[1] : item.dataUrl;
+    const raw = atob(b64);
+    const chunks = [];
+    for (let i = 0; i < raw.length; i += 512) {
+      const slice = raw.slice(i, i + 512);
+      const bytes = new Uint8Array(slice.length);
+      for (let j = 0; j < slice.length; j++) bytes[j] = slice.charCodeAt(j);
+      chunks.push(bytes);
+    }
+    const blob = new Blob(chunks, { type: "application/pdf" });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, "_blank");
+  } catch (_) {
+    window.open(item.dataUrl, "_blank");
+  }
 }
 
 function deletePdfFromLibrary(id){
@@ -2304,6 +2319,16 @@ function formatDateLongEs(iso){
 
 function setFinalizedFlag(){
   localStorage.setItem(FINALIZED_FLAG, "1");
+}
+
+function irARevision(){
+  const nameOk = (document.getElementById('f_nom').value || "").trim().length > 0;
+  const rankOk = (document.getElementById('f_rank').value || "").trim().length > 0;
+  if (!nameOk || !rankOk) {
+    alert("DEBE COMPLETAR LOS DATOS");
+    return;
+  }
+  cambiarPaso(5);
 }
 
 function updatePdfButtonState(){
