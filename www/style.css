@@ -519,8 +519,11 @@ input[type="file"]{display:none;}
   background:var(--card-bg);
   box-shadow:0 3px 12px rgba(30,58,138,0.08);
 }
-.item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--p);font-weight:900;font-size:.9rem;}
+.item-header{display:flex;flex-direction:column;align-items:flex-start;margin-bottom:8px;gap:6px;}
+.foto-label{color:#f59e0b;font-weight:900;font-size:1rem;letter-spacing:1.5px;text-shadow:0 0 8px rgba(245,158,11,0.4);}
+.item-actions{display:flex;gap:8px;}
 .btn-delete{color:#b91c1c;background:#fee2e2;padding:4px 10px;border-radius:5px;cursor:pointer;font-weight:900;}
+.btn-crop{color:#1e40af;background:#dbeafe;padding:4px 10px;border-radius:5px;cursor:pointer;font-weight:900;}
 #status{color:var(--accent);font-weight:900;text-align:center;margin:10px 0;min-height:20px;}
 
 .review-box{

@@ -219,11 +219,11 @@
       <!-- CIERRE -->
       <div id="s4" class="step">
         <h2>Datos de Cierre</h2>
-        <label>Fecha:</label>
+        <label for="f_date">Fecha:</label>
         <input type="date" id="f_date" oninput="saveLocal()">
-        <label>Nombre:</label>
+        <label for="f_nom">Nombre:</label>
         <input type="text" id="f_nom" placeholder="SU NOMBRE COMPLETO" oninput="saveLocal()">
-        <label>Cargo:</label>
+        <label for="f_rank">Cargo:</label>
         <input type="text" id="f_rank" placeholder="SU GRADO O CARGO" oninput="saveLocal()">
 
         <div class="panel" style="margin-top:12px;">
@@ -247,7 +247,7 @@
         <h2>Revisión Final</h2>
 
         <div class="review-box">
-          <label>Título del informe</label>
+          <label for="ti_in_review">Título del informe</label>
           <textarea id="ti_in_review" rows="3" placeholder="Ingrese / edite el título..." oninput="actualizarTituloDesdeRevision(this.value)" spellcheck="true" lang="es"></textarea>
         </div>
 
@@ -302,7 +302,7 @@
 
             <div id="membreteTextFields" class="submenu">
               <div class="review-box" style="margin-top:8px;">
-                <label>Lineas de texto (3)</label>
+                <label for="membreteLine1">Lineas de texto (3)</label>
                 <input type="text" id="membreteLine1" placeholder="Linea 1" maxlength="60" oninput="updateMembreteText()">
                 <input type="text" id="membreteLine2" placeholder="Linea 2" maxlength="60" oninput="updateMembreteText()">
                 <input type="text" id="membreteLine3" placeholder="Linea 3" maxlength="60" oninput="updateMembreteText()">
@@ -311,7 +311,7 @@
 
             <div id="membreteImageFields" class="submenu">
               <div class="review-box" style="margin-top:8px;">
-                <label>Logo (imagen)</label>
+                <label for="membreteImageInput">Logo (imagen)</label>
                 <input type="file" id="membreteImageInput" accept="image/*" onchange="handleMembreteImage(this.files[0])">
                 <img id="membretePreview" alt="Membrete" style="display:none; width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--border); margin-top:6px;">
               </div>
@@ -381,9 +381,9 @@
         <div class="panel">
           <div class="panel-title">Pie de Firma</div>
           <div class="review-box" style="margin-top:8px;">
-            <label>Nombre completo</label>
+            <label for="templateSigName">Nombre completo</label>
             <input type="text" id="templateSigName" placeholder="Ej: JUAN PÉREZ GARCÍA" maxlength="80" oninput="setTemplateSigName(this.value)">
-            <label>Cargo</label>
+            <label for="templateSigRank">Cargo</label>
             <input type="text" id="templateSigRank" placeholder="Ej: INSPECTOR TÉCNICO" maxlength="80" oninput="setTemplateSigRank(this.value)">
             <div style="margin-top:12px; border-top:1px dashed var(--border); padding-top:10px;">
               <div style="font-weight:900; font-size:.78rem; text-transform:uppercase; letter-spacing:.5px; color:var(--dark-gray); margin-bottom:4px;">Firma Digital <span style="font-weight:700; color:var(--muted); text-transform:none;">(opcional)</span></div>
@@ -400,7 +400,7 @@
         </div>
 
         <div class="review-box">
-          <label>Nombre plantilla</label>
+          <label for="newTemplateName">Nombre plantilla</label>
           <input type="text" id="newTemplateName" placeholder="Ej: Informe Basico" maxlength="40">
         </div>
 
@@ -416,7 +416,7 @@
         </div>
 
         <div class="review-box" style="margin-top:12px;">
-          <label style="text-align:center; display:block; font-weight:900; font-size:.9rem; letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px;">LÍNEAS DE TEXTO (3)</label>
+          <label for="reportMembreteLine1" style="text-align:center; display:block; font-weight:900; font-size:.9rem; letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px;">LÍNEAS DE TEXTO (3)</label>
           <input type="text" id="reportMembreteLine1" placeholder="Linea 1" maxlength="60" oninput="updateReportMembreteText()">
           <input type="text" id="reportMembreteLine2" placeholder="Linea 2" maxlength="60" oninput="updateReportMembreteText()">
           <input type="text" id="reportMembreteLine3" placeholder="Linea 3" maxlength="60" oninput="updateReportMembreteText()">
@@ -438,6 +438,15 @@
           <button class="btn-danger" onclick="confirmarEliminarFoto()">ELIMINAR</button>
           <button class="btn-sec" onclick="cerrarModalEliminar()">CANCELAR</button>
         </div>
+      </div>
+    </div>
+
+    <div id="cropModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:12px; box-sizing:border-box;">
+      <p style="color:#fff; font-size:.75rem; letter-spacing:1px; margin:0 0 10px; opacity:.7;">ARRASTRA LAS ESQUINAS PARA RECORTAR</p>
+      <canvas id="cropCanvas" style="max-width:100%; touch-action:none; border-radius:6px;"></canvas>
+      <div style="display:flex; gap:12px; margin-top:14px;">
+        <button class="btn-main" style="padding:12px 22px;" onclick="confirmarCrop()">✂️ CONFIRMAR</button>
+        <button class="btn-sec" style="padding:12px 22px;" onclick="cerrarCrop()">CANCELAR</button>
       </div>
     </div>
 

@@ -1891,6 +1891,227 @@ async function procesarFoto(){
 
 let _pendingDeleteIndex = null;
 
+// ============= RECORTE DE FOTOS =============
+let _cropIndex = null;
+let _cropImgEl = null;
+let _cropNatW = 0, _cropNatH = 0;
+let _cropCanvasW = 0, _cropCanvasH = 0;
+let _cropRect = { x: 0, y: 0, w: 0, h: 0 };
+let _cropDragging = null;
+let _cropDragStart = { x: 0, y: 0, rect: null };
+const CROP_HANDLE_R = 18;
+
+async function abrirCrop(index) {
+  _cropIndex = index;
+  const p = photos[index];
+  const blob = await idbGetPhoto(p.id);
+  if (!blob) return;
+
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    _cropImgEl = img;
+    _cropNatW = img.naturalWidth;
+    _cropNatH = img.naturalHeight;
+
+    const maxW = Math.min(window.innerWidth * 0.95, 780);
+    const maxH = window.innerHeight * 0.68;
+    const scale = Math.min(maxW / _cropNatW, maxH / _cropNatH);
+    _cropCanvasW = Math.round(_cropNatW * scale);
+    _cropCanvasH = Math.round(_cropNatH * scale);
+
+    const canvas = document.getElementById('cropCanvas');
+    canvas.width = _cropCanvasW;
+    canvas.height = _cropCanvasH;
+    canvas.style.width = _cropCanvasW + 'px';
+    canvas.style.height = _cropCanvasH + 'px';
+
+    const inset = 0.08;
+    _cropRect = {
+      x: Math.round(_cropCanvasW * inset),
+      y: Math.round(_cropCanvasH * inset),
+      w: Math.round(_cropCanvasW * (1 - 2 * inset)),
+      h: Math.round(_cropCanvasH * (1 - 2 * inset))
+    };
+
+    URL.revokeObjectURL(url);
+    _dibujarCrop();
+
+    const modal = document.getElementById('cropModal');
+    modal.style.display = 'flex';
+
+    canvas.addEventListener('mousedown', _cropDown);
+    canvas.addEventListener('mousemove', _cropMove);
+    canvas.addEventListener('mouseup', _cropUp);
+    canvas.addEventListener('touchstart', _cropDown, { passive: false });
+    canvas.addEventListener('touchmove', _cropMove, { passive: false });
+    canvas.addEventListener('touchend', _cropUp);
+  };
+  img.src = url;
+}
+
+function _dibujarCrop() {
+  const canvas = document.getElementById('cropCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, _cropCanvasW, _cropCanvasH);
+
+  // Imagen completa
+  ctx.drawImage(_cropImgEl, 0, 0, _cropCanvasW, _cropCanvasH);
+
+  // Overlay oscuro
+  ctx.fillStyle = 'rgba(0,0,0,0.58)';
+  ctx.fillRect(0, 0, _cropCanvasW, _cropCanvasH);
+
+  // Zona recortada (imagen nítida)
+  const { x, y, w, h } = _cropRect;
+  ctx.drawImage(_cropImgEl,
+    x / _cropCanvasW * _cropNatW, y / _cropCanvasH * _cropNatH,
+    w / _cropCanvasW * _cropNatW, h / _cropCanvasH * _cropNatH,
+    x, y, w, h
+  );
+
+  // Borde blanco
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, w, h);
+
+  // Líneas de tercios
+  ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = 1; i < 3; i++) {
+    ctx.moveTo(x + w * i / 3, y); ctx.lineTo(x + w * i / 3, y + h);
+    ctx.moveTo(x, y + h * i / 3); ctx.lineTo(x + w, y + h * i / 3);
+  }
+  ctx.stroke();
+
+  // Handles en las 4 esquinas
+  const handles = _getCropHandles();
+  for (const pt of Object.values(handles)) {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, CROP_HANDLE_R, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+}
+
+function _getCropHandles() {
+  const { x, y, w, h } = _cropRect;
+  return { tl: { x, y }, tr: { x: x+w, y }, bl: { x, y: y+h }, br: { x: x+w, y: y+h } };
+}
+
+function _cropCanvasPos(e) {
+  const canvas = document.getElementById('cropCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width;
+  const sy = canvas.height / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return { x: (src.clientX - rect.left) * sx, y: (src.clientY - rect.top) * sy };
+}
+
+function _cropDown(e) {
+  e.preventDefault();
+  const pos = _cropCanvasPos(e);
+  const handles = _getCropHandles();
+  for (const [key, pt] of Object.entries(handles)) {
+    const dx = pos.x - pt.x, dy = pos.y - pt.y;
+    if (Math.sqrt(dx*dx + dy*dy) <= CROP_HANDLE_R + 10) {
+      _cropDragging = key;
+      _cropDragStart = { x: pos.x, y: pos.y, rect: { ..._cropRect } };
+      return;
+    }
+  }
+  const { x, y, w, h } = _cropRect;
+  if (pos.x >= x && pos.x <= x+w && pos.y >= y && pos.y <= y+h) {
+    _cropDragging = 'move';
+    _cropDragStart = { x: pos.x, y: pos.y, rect: { ..._cropRect } };
+  }
+}
+
+function _cropMove(e) {
+  if (!_cropDragging) return;
+  e.preventDefault();
+  const pos = _cropCanvasPos(e);
+  const dx = pos.x - _cropDragStart.x;
+  const dy = pos.y - _cropDragStart.y;
+  const r = { ..._cropDragStart.rect };
+  const min = 50;
+
+  if (_cropDragging === 'move') {
+    r.x = Math.max(0, Math.min(_cropCanvasW - r.w, r.x + dx));
+    r.y = Math.max(0, Math.min(_cropCanvasH - r.h, r.y + dy));
+  } else if (_cropDragging === 'tl') {
+    const nx = Math.max(0, Math.min(r.x + r.w - min, r.x + dx));
+    const ny = Math.max(0, Math.min(r.y + r.h - min, r.y + dy));
+    r.w = r.x + r.w - nx; r.h = r.y + r.h - ny; r.x = nx; r.y = ny;
+  } else if (_cropDragging === 'tr') {
+    const ny = Math.max(0, Math.min(r.y + r.h - min, r.y + dy));
+    r.w = Math.max(min, Math.min(_cropCanvasW - r.x, r.w + dx));
+    r.h = r.y + r.h - ny; r.y = ny;
+  } else if (_cropDragging === 'bl') {
+    const nx = Math.max(0, Math.min(r.x + r.w - min, r.x + dx));
+    r.w = r.x + r.w - nx; r.x = nx;
+    r.h = Math.max(min, Math.min(_cropCanvasH - r.y, r.h + dy));
+  } else if (_cropDragging === 'br') {
+    r.w = Math.max(min, Math.min(_cropCanvasW - r.x, r.w + dx));
+    r.h = Math.max(min, Math.min(_cropCanvasH - r.y, r.h + dy));
+  }
+
+  _cropRect = r;
+  _dibujarCrop();
+}
+
+function _cropUp() { _cropDragging = null; }
+
+async function confirmarCrop() {
+  const { x, y, w, h } = _cropRect;
+  const scaleX = _cropNatW / _cropCanvasW;
+  const scaleY = _cropNatH / _cropCanvasH;
+  const srcX = Math.round(x * scaleX);
+  const srcY = Math.round(y * scaleY);
+  const srcW = Math.round(w * scaleX);
+  const srcH = Math.round(h * scaleY);
+
+  // Escalar al tamaño estándar del PDF (300dpi): vertical=8cm=945px, horizontal/cuadrada=10cm=1181px
+  const hRatio = srcH / srcW;
+  const outW = hRatio > 1 ? 945 : 1181;
+  const outH = Math.round(outW * hRatio);
+
+  const offscreen = document.createElement('canvas');
+  offscreen.width = outW;
+  offscreen.height = outH;
+  offscreen.getContext('2d').drawImage(_cropImgEl, srcX, srcY, srcW, srcH, 0, 0, outW, outH);
+
+  offscreen.toBlob(async (blob) => {
+    if (!blob) return;
+    const p = photos[_cropIndex];
+    await idbPutPhoto(p.id, blob);
+    photoDataUrlCache.delete(p.id);
+    p.hRatio = srcH / srcW;
+    saveLocal();
+    cerrarCrop();
+    dibujarRevision();
+  }, 'image/jpeg', 0.92);
+}
+
+function cerrarCrop() {
+  const canvas = document.getElementById('cropCanvas');
+  canvas.removeEventListener('mousedown', _cropDown);
+  canvas.removeEventListener('mousemove', _cropMove);
+  canvas.removeEventListener('mouseup', _cropUp);
+  canvas.removeEventListener('touchstart', _cropDown);
+  canvas.removeEventListener('touchmove', _cropMove);
+  canvas.removeEventListener('touchend', _cropUp);
+  document.getElementById('cropModal').style.display = 'none';
+  _cropIndex = null;
+  _cropImgEl = null;
+  _cropDragging = null;
+}
+// ============= FIN RECORTE =============
+
 function eliminarFoto(index){
   _pendingDeleteIndex = index;
   document.getElementById('deletePhotoModal').style.display = 'flex';
@@ -2031,8 +2252,11 @@ function dibujarRevision(){
 
     div.innerHTML = `
       <div class="item-header">
-        <span>FOTO ${(i+1).toString().padStart(2, '0')}</span>
-        <span class="btn-delete" onclick="eliminarFoto(${i})">ELIMINAR ✕</span>
+        <span class="foto-label">FOTO ${(i+1).toString().padStart(2, '0')}</span>
+        <div class="item-actions">
+          <span class="btn-crop" onclick="abrirCrop(${i})">✂️ RECORTAR</span>
+          <span class="btn-delete" onclick="eliminarFoto(${i})">🗑️ ELIMINAR</span>
+        </div>
       </div>
 
       <img src="" style="width:100%; border-radius:10px; border:1px solid #ddd; margin-bottom:6px;">
